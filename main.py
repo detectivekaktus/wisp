@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
+from asyncio import run
 from sys import argv
 from typing import cast
 from src import DEBUG_TOKEN, DISCORD_TOKEN
 from src.client import bot
+from src.datagen.icons import download_hero_icons
 
 
 def usage() -> None:
-    print(f"Usage: {argv[0]} [run | debug]  ")
-    print("  run:   run the bot             ") 
-    print("  debug: debug the the bot       ")
+    print(f"Usage: {argv[0]} [run | debug | gen]    ")
+    print("  run:   run the bot                     ") 
+    print("  debug: debug the the bot               ")
+    print("  gen:   generates the data for the bot  ")
+    print("    icons: generates the hero icons      ")
 
 
 def crash(msg: str) -> None:
@@ -17,7 +21,7 @@ def crash(msg: str) -> None:
     exit(1)
 
 
-if __name__ == "__main__":
+def main() -> None:
     if len(argv) < 2:
         crash("Not enough arguments.")
 
@@ -30,5 +34,15 @@ if __name__ == "__main__":
         if not DEBUG_TOKEN:
             crash("'DEBUG_TOKEN' environment variable is not set up properly.")
         crash("Not implemented")
+    elif argv[ap] == "gen":
+        ap += 1
+        if argv[ap] == "icons":
+            run(download_hero_icons())
+        else:
+            crash(f"Unknown subcommand {argv[ap]} for `gen` commmand")
     else:
         crash(f"Unknown command {argv[ap]}")
+
+
+if __name__ == "__main__":
+    main()
