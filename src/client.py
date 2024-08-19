@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from os import listdir
-from typing import Final
+from typing import Final, override
 from discord import Activity, ActivityType, Intents, Status
 from discord.ext.commands import Bot
 from src.utils.logging import LOGGER
@@ -8,11 +8,23 @@ from src.utils.logging import LOGGER
 
 INTENTS: Final[Intents] = Intents.default()
 INTENTS.message_content = True
-bot = Bot(command_prefix='?',
-          intents=INTENTS,
-          owner_id=692305905123065918,
-          activity=Activity(type=ActivityType.playing, name="3/2/2 on Pudge"),
-          status=Status.idle)
+class Wisp(Bot):
+    def __init__(self, intents: Intents) -> None:
+        super().__init__(command_prefix='?',
+                         intents=intents,
+                         owner_id=692305905123065918,
+                         activity=Activity(type=ActivityType.playing, name="3/2/2 on Pudge"),
+                         status=Status.idle)
+
+
+    @override
+    async def setup_hook(self) -> None:
+        LOGGER.info("Loading modules from `src.cogs`.")
+        await load_cogs()
+        LOGGER.info(f"Successfully syncronized {len(await self.tree.sync())} commands globally.")
+
+
+bot = Wisp(INTENTS)
 bot.remove_command("help")
 
 
