@@ -40,13 +40,15 @@ class Players(Cog):
     @command(name="wordcloud", description="Displays the most used words the player says")
     @describe(id="Player's account ID")
     async def wordcloud(self, interaction: Interaction, id: int) -> None:
+        await interaction.response.defer()
+
         wc = await OpenDota.get_player_wordcloud(id)
-        if not wc:
-            await interaction.response.send_message(embed=PlayerNotFoundEmbed(f"Couldn't find the player with this ID: {id}"))
+        if not wc or "all_word_counts" not in wc:
+            await interaction.followup.send(embed=PlayerNotFoundEmbed(f"Couldn't find the player with this ID: {id}"))
             return
 
         msg = ", ".join([key for key in wc["all_word_counts"].keys()])
-        await interaction.response.send_message(msg[:1024])
+        await interaction.followup.send(msg[:2000])
 
 
 async def setup(bot: Bot) -> None:
