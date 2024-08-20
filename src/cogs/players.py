@@ -4,9 +4,11 @@ from discord import Embed, Interaction
 from discord.app_commands import command, describe
 from discord.ext.commands import Bot, Cog
 from src.api.opendota import OpenDota
-from src.utils.constants import RANKS
+from src.ui.views import HeroesPager
+from src.utils.calc import calculate_winrate
+from src.constants import RANKS
 from src.utils.embeds import PlayerNotFoundEmbed
-from src.utils.emojis import ICONS, dota_plus
+from src.emojis import ICONS, dota_plus
 
 
 class Players(Cog):
@@ -18,21 +20,22 @@ class Players(Cog):
     @command(name="player", description="Displays general information about the player")
     @describe(id="Player's account ID")
     async def player(self, interaction: Interaction, id: int) -> None:
-        results = await gather(*[create_task(OpenDota.get_player(id)), create_task(OpenDota.get_player_winrate(id)), create_task(OpenDota.get_player_heroes(id))])
-        for res in results:
-            if not res:
-                await interaction.response.send_message(embed=PlayerNotFoundEmbed(f"Couldn't find the player with this ID: {id}"))
-                return
+        generic, wl, heroes = await gather(*[create_task(OpenDota.get_player(id)), create_task(OpenDota.get_player_winrate(id)), create_task(OpenDota.get_player_heroes(id))])
+        if not generic or not wl or not heroes:
+            await interaction.response.send_message(embed=PlayerNotFoundEmbed(id))
+            return
 
         embed = Embed()
-        embed.add_field(name="Rank", value=RANKS[results[0]["rank_tier"]], inline=False)
-        embed.add_field(name="Winrate", value=f"{round(results[1]["win"] / (results[1]["win"] + results[1]["lose"]) * 100, 2)}%", inline=False)
-        embed.add_field(name="Wins", value=results[1]["win"])
-        embed.add_field(name="Loses", value=results[1]["lose"])
-        embed.add_field(name=f"Has Dota Plus subscription {dota_plus}", value="Yes" if results[0]["profile"]["plus"] else "No", inline=False)
-        embed.add_field(name="Most played heroes", value="".join([ICONS[hero["hero_id"]] for hero in results[2][:5]]), inline=False)
-        embed.set_author(name=f"{results[0]["profile"]["personaname"]} on Steam", url=results[0]["profile"]["profileurl"])
-        embed.set_thumbnail(url=results[0]["profile"]["avatarfull"])
+        embed.add_field(name="Rank", value=RANKS[generic["rank_tier"]], inline=False)
+        embed.add_field(name="Winrate", value=f"{calculate_winrate(wl["win"], loses=wl["lose"])}%", inline=False)
+        embed.add_field(name="Wins", value=wl["win"])
+        embed.add_field(name="Loses", value=wl["lose"])
+        embed.add_field(name="Most played heroes", value="".join([ICONS[hero["hero_id"]] for hero in heroes[:5]]), inline=False)
+        embed.add_field(name=f"Has Dota Plus subscription {dota_plus}",
+                        value="Yes" if generic["profile"]["plus"] else "No",
+                        inline=False)
+        embed.set_author(name=f"{generic["profile"]["personaname"]} on Steam", url=generic["profile"]["profileurl"])
+        embed.set_thumbnail(url=generic["profile"]["avatarfull"])
 
         await interaction.response.send_message(embed=embed)
 
@@ -44,11 +47,24 @@ class Players(Cog):
 
         wc = await OpenDota.get_player_wordcloud(id)
         if not wc or "all_word_counts" not in wc:
-            await interaction.followup.send(embed=PlayerNotFoundEmbed(f"Couldn't find the player with this ID: {id}"))
+            await interaction.followup.send(embed=PlayerNotFoundEmbed(id))
             return
 
-        msg = ", ".join([key for key in wc["all_word_counts"].keys()])
-        await interaction.followup.send(msg[:2000])
+        await interaction.followup.send(", ".join([key for key in wc["all_word_counts"].keys()])[:2000])
+
+
+    @command(name="player-heroes", description="Displays the most played heroes of the player")
+    @describe(id="Player's account ID")
+    async def player_heroes(self, interaction: Interaction, id: int) -> None:
+        data = await OpenDota.get_player_heroes(id)
+        if not data:
+            await interaction.response.send_message(embed=PlayerNotFoundEmbed(id))
+            return
+
+        pager = HeroesPager(interaction, data)
+        await pager.render_msg(edit=False)
+        pager.msg = await interaction.original_response()
+
 
 
 async def setup(bot: Bot) -> None:

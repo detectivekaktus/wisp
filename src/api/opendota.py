@@ -23,7 +23,7 @@ class OpenDota:
 
 
     @staticmethod
-    async def get_player_heroes(id: int) -> Optional[dict[str, int]]:
+    async def get_player_heroes(id: int) -> Optional[list[dict[str, int]]]:
         async with ClientSession() as session:
             return await get(session, f"{BASE_URL}/players/{id}/heroes")
 

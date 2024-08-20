@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from typing import Any, Optional
+from typing import Any
 from aiohttp import ClientSession
 
 
-async def get(session: ClientSession, url: str) -> Optional[dict[str, Any]]:
+async def get(session: ClientSession, url: str) -> Any:
     async with session.get(url) as r:
         if r.status == 200:
             return await r.json()
