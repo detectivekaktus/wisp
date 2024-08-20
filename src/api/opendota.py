@@ -33,8 +33,26 @@ class OpenDota:
         async with ClientSession() as session:
             return await get(session, f"{BASE_URL}/players/{id}/wordcloud")
 
+    
+    @staticmethod
+    async def get_player_recent_matches(id: int) -> Optional[list[dict[str, Any]]]:
+        async with ClientSession() as session:
+            return await get(session, f"{BASE_URL}/players/{id}/recentMatches")
+
 
     @staticmethod
     async def refresh_player(id: int) -> bool:
         async with ClientSession() as session:
             return await post(session, f"{BASE_URL}/players/{id}/refresh") == 200
+
+
+def is_radiant(pos: int) -> bool:
+    return pos < 128
+
+
+LOBBY_TYPES: Final[dict[int, str]] = {
+    0: "Normal",
+    1: "Practice",
+    2: "Tournament",
+    7: "Ranked",
+}

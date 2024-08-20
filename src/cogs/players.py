@@ -4,7 +4,7 @@ from discord import Embed, Interaction
 from discord.app_commands import command, describe
 from discord.ext.commands import Bot, Cog
 from src.api.opendota import OpenDota
-from src.ui.views import HeroesPager
+from src.ui.views import HeroesPager, MatchesPager
 from src.utils.calc import calculate_winrate
 from src.constants import RANKS
 from src.utils.embeds import PlayerNotFoundEmbed
@@ -65,6 +65,18 @@ class Players(Cog):
         await pager.render_msg(edit=False)
         pager.msg = await interaction.original_response()
 
+
+    @command(name="player-matches", description="Displays the 5 most recent matches of the player")
+    @describe(id="Player's account ID")
+    async def player_matches(sel, interaction: Interaction, id: int) -> None:
+        matches = await OpenDota.get_player_recent_matches(id)
+        if not matches:
+            await interaction.response.send_message(embed=PlayerNotFoundEmbed(id))
+            return
+        
+        pager = MatchesPager(interaction, matches)
+        await pager.render_msg(edit=False)
+        pager.msg = await interaction.original_response()
 
 
 async def setup(bot: Bot) -> None:
