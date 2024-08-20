@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+from typing import Final
 
-ICONS: dict[int, str] = {
+
+ICONS: Final[dict[int, str]] = {
     1: "<:antimage_icon:1274867157041414165>",
     2: "<:axe_icon:1274867174221152387>",
     3: "<:bane_icon:1274867183364603934>",
@@ -126,3 +128,5 @@ ICONS: dict[int, str] = {
     137: "<:primal_beast_icon:1274868421988978802>",
     138: "<:muerta_icon:1274868062012706816>"
 }
+
+dota_plus = "<:dotaplus:1275400946234425375>"
