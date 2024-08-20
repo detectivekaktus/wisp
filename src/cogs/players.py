@@ -45,7 +45,8 @@ class Players(Cog):
             await interaction.response.send_message(embed=PlayerNotFoundEmbed(f"Couldn't find the player with this ID: {id}"))
             return
 
-        await interaction.response.send_message(", ".join([key for key in wc["all_word_counts"].keys()]))
+        msg = ", ".join([key for key in wc["all_word_counts"].keys()])
+        await interaction.response.send_message(msg[:1024])
 
 
 async def setup(bot: Bot) -> None:
