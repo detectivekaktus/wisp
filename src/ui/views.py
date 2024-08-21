@@ -160,9 +160,15 @@ class MatchPager(Pager):
                 self.embed.add_field(name=f"Radiant {self.data["radiant_score"]}", value="".join([ICONS[hero["hero_id"]] for hero in self.data["players"] if hero["isRadiant"]]))
                 self.embed.add_field(name=f"Dire {self.data["dire_score"]}", value="".join([ICONS[hero["hero_id"]] for hero in self.data["players"] if not hero["isRadiant"]]))
             case self.HEROES:
-                self.embed = Embed(title=f"Match {self.data["match_id"]}")
+                self.embed = Embed(
+                    title=f"Match {self.data["match_id"]}",
+                    description="To be done."
+                )
             case self.MAP:
-                self.embed = Embed(title=f"Match {self.data["match_id"]}")
+                self.embed = Embed(
+                    title=f"Match {self.data["match_id"]}",
+                    description="To be done."
+                )
 
 
 
