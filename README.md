@@ -7,3 +7,6 @@ The project relies on the [Steam Web API](https://developer.valvesoftware.com/wi
 
 ## How to host
 It's empty for now.
+
+## Copyright
+wisp, is an independent, open-source initiative and is not affiliated with or endorsed by Valve Corporation. DotA 2, Steam, and all related trademarks, logos, and other intellectual property are the property of Valve Corporation. All references to DotA 2, Steam, and their associated trademarks are for informational purposes only.

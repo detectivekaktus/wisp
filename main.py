@@ -5,6 +5,7 @@ from typing import cast
 from src import DEBUG_TOKEN, DISCORD_TOKEN
 from src.client import bot
 from src.datagen.icons import download_hero_icons
+from src.datagen.items import download_item_icons
 
 
 def usage() -> None:
@@ -12,7 +13,8 @@ def usage() -> None:
     print("  run:   run the bot                     ") 
     print("  debug: debug the the bot               ")
     print("  gen:   generates the data for the bot  ")
-    print("    icons: generates the hero icons      ")
+    print("    heroes: generates the hero icons     ")
+    print("    items: geenrates the item icons      ")
 
 
 def crash(msg: str) -> None:
@@ -36,8 +38,10 @@ def main() -> None:
         crash("Not implemented")
     elif argv[ap] == "gen":
         ap += 1
-        if argv[ap] == "icons":
+        if argv[ap] == "heroes":
             run(download_hero_icons())
+        elif argv[ap] == "items":
+            run(download_item_icons())
         else:
             crash(f"Unknown subcommand {argv[ap]} for `gen` commmand")
     else:
