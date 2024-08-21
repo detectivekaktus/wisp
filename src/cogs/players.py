@@ -66,7 +66,7 @@ class Players(Cog):
         pager.msg = await interaction.original_response()
 
 
-    @command(name="player-matches", description="Displays the 5 most recent matches of the player")
+    @command(name="player-matches", description="Displays the most recent matches of the player")
     @describe(id="Player's account ID")
     async def player_matches(sel, interaction: Interaction, id: int) -> None:
         matches = await OpenDota.get_player_recent_matches(id)
